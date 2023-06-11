@@ -67,12 +67,18 @@ public class CursoServices {
             return "ERROR: La edad no puede ser numero negativo ni mayor a 100.";
         if (alumno.getApellido().length() > 20 || alumno.getNombre().length() > 20)
             return "ERROR: Ni el nombre ni el apellido debe exceder los 20 carácteres";
+        if(!validarLetrasYEspacios(alumno.getApellido()) || !validarLetrasYEspacios(alumno.getNombre()))
+            return "ERROR: El nombre y el apellido deben contener solo letras mayúsculas, minúsculas y espacios.";
         if (alumno.getNotaExamenIngreso() < 1 || alumno.getNotaExamenIngreso() > 10)
             return "ERROR: La nota debe ir del 1 al 10";
 
         return "";
     }
 
+    public boolean validarLetrasYEspacios(String campo) {
+        String regex = "^[a-zA-Z ]+$";
+        return campo.matches(regex);
+    }
     public List<Alumno> ordenarDecrecientementePorApellido(Curso curso) {
         return listaAlumnos.stream().sorted(Comparator.comparing((Alumno a) -> a.getApellido()).reversed()).toList();
     }
