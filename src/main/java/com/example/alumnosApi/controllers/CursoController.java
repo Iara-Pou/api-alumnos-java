@@ -53,6 +53,10 @@ public class CursoController {
     @DeleteMapping ("/borrarAlumno/{id}")
     public String borrarAlumno(@PathVariable("id") int id){
         return cursoServices.borrarAlumno(id);
+
+    @GetMapping("*")
+    public String rutaNoEncontrada(){
+        return "ERROR 404: La ruta a la que ingresó, no existe.";
     }
 
 }
