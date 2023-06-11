@@ -2,7 +2,6 @@ package com.example.alumnosApi.controllers;
 
 import com.example.alumnosApi.entities.Alumno;
 import com.example.alumnosApi.services.CursoServices;
-import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,18 +37,16 @@ public class CursoController {
     }
 
     @PostMapping("/sumarAlumno")
-    public String sumarAlumno(@RequestBody String infoalumno){
-        Gson g = new Gson();
-        Alumno alumno = g.fromJson(infoalumno, Alumno.class);
-
-        return cursoServices.sumarAlumno(alumno);
+    public String sumarAlumno(@RequestBody Alumno alumno){
+        try{
+            return cursoServices.sumarAlumno(alumno);
+        } catch (Exception e){
+            return "No se pudo cargar correctamente al alumno ¡Revisar los datos ingresados, por favor!";
+        }
     }
 
     @PutMapping("/cambiarAlumno")
-    public String modificarAlumno(@RequestBody String infoalumno){
-        Gson g = new Gson();
-        Alumno alumno = g.fromJson(infoalumno, Alumno.class);
-
+    public String modificarAlumno(@RequestBody Alumno alumno){
         return cursoServices.editarAlumno(alumno);
     }
 
