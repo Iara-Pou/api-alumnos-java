@@ -50,19 +50,27 @@ public class CursoServices {
 
     }
 
-    private boolean validarAlumno (Alumno alumno) {
-        boolean UsuarioValido = true;
+    private boolean validarAlumno(Alumno alumno) {
+        boolean usuarioValido = true;
 
-        UsuarioValido = alumno.getEdad() == 0 ? false : true;
-        UsuarioValido = alumno.getApellido() == null ? false : true;
-        UsuarioValido = alumno.getNombre() == null ? false : true;
+        //chequea que no haya campos vacíos
+        if (Objects.isNull(alumno.getApellido()) ||
+                Objects.isNull(alumno.getNombre()) ||
+                Objects.isNull(alumno.isAbonoMatricula()) ||
+                Objects.isNull(alumno.getEdad()) ||
+                Objects.isNull(alumno.getNotaExamenIngreso()) ||
+                Objects.isNull(alumno.isAdeudaMateriasSecundario())) {
+            usuarioValido = false;
+        }
 
-        //esto funciona mal porque con Gson, rellena los nulos con false, y los ids con 0.
-        //La edad tampoco funciona, wtf
-        //     UsuarioValido = alumno.isAbonoMatricula() == null ? false: true;
-        //    UsuarioValido = alumno.getNombre() == null ? false: true;
+        //edad no puede ser numero negativo ni mayor a 100
+        if(alumno.getEdad()<0 || alumno.getEdad()>100) usuarioValido = false;
+        //nombre y apellido no pueden exceder los 20 carácteres
+        if(alumno.getApellido().length() >20 || alumno.getNombre().length() >20) usuarioValido = false;
+        //nota examen debe estar entre 1 y 10
+        if(alumno.getNotaExamenIngreso() <1 || alumno.getNotaExamenIngreso()>10) usuarioValido = false;
 
-        return UsuarioValido;
+        return usuarioValido;
     }
 
     public List<Alumno> ordenarDecrecientementePorApellido(Curso curso){
