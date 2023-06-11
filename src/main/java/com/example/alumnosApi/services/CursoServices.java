@@ -9,6 +9,7 @@ import java.util.regex.*;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class CursoServices {
@@ -77,13 +78,9 @@ public class CursoServices {
     }
 
     public double obtenerPromedioEdades() {
-        double totalEdades = 0;
+        double totalEdades = listaAlumnos.stream().mapToInt(Alumno::getEdad).sum();
 
-        for (int i = 0; i < listaAlumnos.size(); i++) {
-            totalEdades += listaAlumnos.get(i).getEdad();
-        }
-
-        return totalEdades / (listaAlumnos.size());
+        return totalEdades / listaAlumnos.size();
     }
 
 
@@ -96,17 +93,8 @@ public class CursoServices {
     }
 
     public List<Alumno> obtenerAlumnoConMayorNota() {
-        double notaMaxima = 0;
-
-        for (int i = 0; i < this.listaAlumnos.size(); i++) {
-            double notaIterada = listaAlumnos.get(i).getNotaExamenIngreso();
-            if (notaIterada > notaMaxima) {
-                notaMaxima = notaIterada;
-            }
-        }
-        //puede haber + de uno con mayor nota. Por eso lista
-        double finalNotaMaxima = notaMaxima;
-        return listaAlumnos.stream().filter(a -> a.getNotaExamenIngreso() == finalNotaMaxima).toList();
+        double notaMaxima = listaAlumnos.stream().mapToDouble(Alumno::getNotaExamenIngreso).max().orElse(0);
+        return listaAlumnos.stream().filter(a -> a.getNotaExamenIngreso() == notaMaxima).collect(Collectors.toList());
     }
 
 }
