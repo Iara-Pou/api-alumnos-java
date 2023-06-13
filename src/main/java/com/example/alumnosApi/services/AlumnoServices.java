@@ -2,28 +2,36 @@ package com.example.alumnosApi.services;
 
 import com.example.alumnosApi.entities.Alumno;
 import com.example.alumnosApi.entities.Curso;
+import com.example.alumnosApi.repositories.AlumnoRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.regex.*;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
-public class CursoServices {
+public class AlumnoServices {
 
     Curso curso = new Curso();
     List<Alumno> listaAlumnos = curso.getAlumnos();
-
+    @Autowired
+    private AlumnoRepository alumnoRepository;
+    //INYECTAR EL REPO POR CONSTRUCTOR
     public List mostrarAlumnos() {
-        return ordenarDecrecientementePorApellido(this.curso);
+        return alumnoRepository.findAll();
+        //return ordenarDecrecientementePorApellido(this.curso);
     }
 
     public String sumarAlumno(Alumno alumno) {
         if (validarAlumno(alumno).isBlank()) {
-            listaAlumnos.add(alumno);
+            alumnoRepository.save(alumno);
+            //listaAlumnos.add(alumno);
+
+            //no entiendo como hago si acá tiene que devolver un String. Como hago para que pueda devolver un string
+            //o un objeto?
+
             return "¡El usuario " + alumno.getNombre() + " " + alumno.getApellido() + " se ha ingresado correctamente!";
         } else {
             return validarAlumno(alumno);
@@ -32,24 +40,36 @@ public class CursoServices {
 
 
     public String editarAlumno(Alumno alumno) {
-        try {
-            borrarAlumno(alumno.getId());
-            sumarAlumno(alumno);
+        alumnoRepository.delete(alumno);
+        alumnoRepository.save(alumno);
+        //try {
+            //borrarAlumno(alumno.getId());
+            //sumarAlumno(alumno);
             return "¡El usuario " + alumno.getNombre() + " " + alumno.getApellido() + " se ha modificado correctamente!";
-        } catch (Exception e) {
-            return "La operación falló. Revisar los datos ingresados, ¡Por favor!";
-        }
+        //} catch (Exception e) {
+        //    return "La operación falló. Revisar los datos ingresados, ¡Por favor!";
+        //}
     }
 
-    public String borrarAlumno(int id) {
-        List alumnosPedidos = listaAlumnos.stream().filter(alumno -> alumno.getId() == id).toList();
+    public String borrarAlumno(Long id) {
 
-        if (alumnosPedidos.size() >= 1) {
-            alumnosPedidos.forEach(alumno -> listaAlumnos.remove(alumno));
-            return "¡Operación realizada con éxito!";
-        } else {
+        if(alumnoRepository.existsById(id)) {
+            //si existe ese registro, que lo borre
+            alumnoRepository.deleteById(id);
+            return "Operación realizada con éxito.";
+        }else {
+            //sino, avisar que no existe
             return "ERROR: No existe ningún alumno con ese id.";
         }
+
+        //List alumnosPedidos = listaAlumnos.stream().filter(alumno -> alumno.getId() == id).toList();
+
+        //if (alumnosPedidos.size() >= 1) {
+            //alumnosPedidos.forEach(alumno -> listaAlumnos.remove(alumno));
+            //return "¡Operación realizada con éxito!";
+        //} else {
+            //return "ERROR: No existe ningún alumno con ese id.";
+        //}
 
     }
 
