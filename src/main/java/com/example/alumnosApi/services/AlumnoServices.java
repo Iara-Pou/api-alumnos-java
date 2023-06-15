@@ -6,93 +6,94 @@ import com.example.alumnosApi.repositories.AlumnoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class AlumnoServices {
 
     Curso curso = new Curso();
-    List<Alumno> listaAlumnos = curso.getAlumnos();
+    //    List<Alumno> listaAlumnos = curso.getAlumnos();
     @Autowired
     private AlumnoRepository alumnoRepository;
+
     //INYECTAR EL REPO POR CONSTRUCTOR
-    public List mostrarAlumnos() {
+    public List<Alumno> mostrarAlumnos() {
         return alumnoRepository.findAll();
-        //return ordenarDecrecientementePorApellido(this.curso);
     }
 
-    public String sumarAlumno(Alumno alumno) {
-        if (validarAlumno(alumno).isBlank()) {
+    public Response sumarAlumno(Alumno alumno) {
+        Response respuesta = new Response();
+        List error = validarAlumno(alumno);
+
+        if (error.size() == 0) {
             alumnoRepository.save(alumno);
-            //listaAlumnos.add(alumno);
-
-            //no entiendo como hago si acá tiene que devolver un String. Como hago para que pueda devolver un string
-            //o un objeto?
-
-            return "¡El usuario " + alumno.getNombre() + " " + alumno.getApellido() + " se ha ingresado correctamente!";
+            respuesta.setData(Collections.singletonList(alumno));
         } else {
-            return validarAlumno(alumno);
+            respuesta.setMensajeError(error);
         }
+
+        return respuesta;
     }
 
+    public Response editarAlumno(Long id, Alumno alumno) {
+        Response respuesta = new Response();
+        List<String> mensajeError = new ArrayList<>();
 
-    public String editarAlumno(Alumno alumno) {
-        alumnoRepository.delete(alumno);
-        alumnoRepository.save(alumno);
-        //try {
-            //borrarAlumno(alumno.getId());
-            //sumarAlumno(alumno);
-            return "¡El usuario " + alumno.getNombre() + " " + alumno.getApellido() + " se ha modificado correctamente!";
-        //} catch (Exception e) {
-        //    return "La operación falló. Revisar los datos ingresados, ¡Por favor!";
-        //}
+        if (Objects.isNull(id)) {
+            mensajeError.add("El id no puede estar incompleto.");
+        } else if (!alumnoRepository.existsById(id)) {
+            mensajeError.add("El id no pertenece a ningún campo. Inicializamos el usuario en otro id.");
+        } else {
+            borrarAlumno(id);
+        }
+
+        Response respuestaCrear = sumarAlumno(alumno);
+        if (!Objects.isNull(respuestaCrear.getMensajeError())) {
+            mensajeError.add(respuestaCrear.getMensajeError().get(0));
+        } else {
+            respuesta.setData(Collections.singletonList(alumno));
+        }
+
+        respuesta.setMensajeError(mensajeError);
+        return respuesta;
     }
 
-    public String borrarAlumno(Long id) {
+    public Response borrarAlumno(Long id) {
+        Response respuesta = new Response();
 
-        if(alumnoRepository.existsById(id)) {
-            //si existe ese registro, que lo borre
+        if (alumnoRepository.existsById(id)) {
+            respuesta.setData(alumnoRepository.findById(id).stream().toList());
             alumnoRepository.deleteById(id);
-            return "Operación realizada con éxito.";
-        }else {
-            //sino, avisar que no existe
-            return "ERROR: No existe ningún alumno con ese id.";
+        } else {
+            respuesta.setMensajeError(Collections.singletonList("No existe ningún alumno con ese id."));
         }
 
-        //List alumnosPedidos = listaAlumnos.stream().filter(alumno -> alumno.getId() == id).toList();
-
-        //if (alumnosPedidos.size() >= 1) {
-            //alumnosPedidos.forEach(alumno -> listaAlumnos.remove(alumno));
-            //return "¡Operación realizada con éxito!";
-        //} else {
-            //return "ERROR: No existe ningún alumno con ese id.";
-        //}
-
+        return respuesta;
     }
 
-    private String validarAlumno(Alumno alumno) {
-
+    private List<String> validarAlumno(Alumno alumno) {
+        List errores = new ArrayList<String>();
+        //esto sería mejor como una lista de errores. También están las validaciones de spring though
+        //por cada if sumo un error, retorno lista y el response tiene esa lista como error.
         if (Objects.isNull(alumno.getApellido()) ||
                 Objects.isNull(alumno.getNombre()) ||
                 Objects.isNull(alumno.isAbonoMatricula()) ||
                 Objects.isNull(alumno.getEdad()) ||
                 Objects.isNull(alumno.getNotaExamenIngreso()) ||
                 Objects.isNull(alumno.isAdeudaMateriasSecundario()))
-            return "ERROR: Ningún campo debe estar vacío.";
+            errores.add("Ningún campo debe estar vacío.");
 
         if (alumno.getEdad() < 0 || alumno.getEdad() > 100)
-            return "ERROR: La edad no puede ser numero negativo ni mayor a 100.";
+            errores.add("La edad no puede ser numero negativo ni mayor a 100.");
         if (alumno.getApellido().length() > 20 || alumno.getNombre().length() > 20)
-            return "ERROR: Ni el nombre ni el apellido debe exceder los 20 carácteres";
-        if(!validarLetrasYEspacios(alumno.getApellido()) || !validarLetrasYEspacios(alumno.getNombre()))
-            return "ERROR: El nombre y el apellido deben contener solo letras mayúsculas, minúsculas y espacios.";
+            errores.add("Ni el nombre ni el apellido debe exceder los 20 carácteres");
+        if (!validarLetrasYEspacios(alumno.getApellido()) || !validarLetrasYEspacios(alumno.getNombre()))
+            errores.add("El nombre y el apellido deben contener solo letras mayúsculas, minúsculas y espacios.");
         if (alumno.getNotaExamenIngreso() < 1 || alumno.getNotaExamenIngreso() > 10)
-            return "ERROR: La nota debe ir del 1 al 10";
+            errores.add("La nota debe ir del 1 al 10");
 
-        return "";
+        return errores;
     }
 
     public boolean validarLetrasYEspacios(String campo) {
