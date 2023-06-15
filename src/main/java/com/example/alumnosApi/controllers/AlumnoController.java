@@ -35,22 +35,14 @@ public class AlumnoController {
         return alumnoServices.sumarAlumno(alumno);
     }
 
-    @PutMapping("/cambiarAlumno")
-    public String modificarAlumno(@RequestBody Alumno alumno){
-        try {
-            return alumnoServices.editarAlumno(alumno);
-        } catch (Exception e){
-            return "ERROR: El alumno no existe en sistema!";
-        }
+    @PutMapping("/actualizar/{id}")
+    public Response modificarAlumno(@RequestBody Alumno alumnoActualizado, @PathVariable("id") Long id){
+        return alumnoServices.editarAlumno(id, alumnoActualizado);
     }
 
-    @DeleteMapping ("/borrarAlumno/{id}")
-    public String borrarAlumno(@PathVariable("id") Long id){
-        try{
+    @DeleteMapping ("/borrar/{id}")
+    public Response borrarAlumno(@PathVariable("id") Long id){
         return alumnoServices.borrarAlumno(id);
-        } catch (Exception e){
-            return "ERROR: no se ingresó un numero para el id.";
-        }
     }
 
     @GetMapping("*")
