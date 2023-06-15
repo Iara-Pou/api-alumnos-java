@@ -99,28 +99,29 @@ public class AlumnoServices {
         String regex = "^[a-zA-Z ]+$";
         return campo.matches(regex);
     }
-    public List<Alumno> ordenarDecrecientementePorApellido(Curso curso) {
-        return listaAlumnos.stream().sorted(Comparator.comparing((Alumno a) -> a.getApellido()).reversed()).toList();
+
+    public List<Alumno> ordenarDecrecientementePorApellido() {
+        return alumnoRepository.findAll().stream().sorted(Comparator.comparing((Alumno a) -> a.getApellido()).reversed()).toList();
     }
 
     public double obtenerPromedioEdades() {
-        double totalEdades = listaAlumnos.stream().mapToInt(Alumno::getEdad).sum();
-
-        return totalEdades / listaAlumnos.size();
+        //implemento lo mismo pero llamo al repo y uso findAll()
+        double totalEdades = alumnoRepository.findAll().stream().mapToInt(Alumno::getEdad).sum();
+        return totalEdades / alumnoRepository.findAll().size();
     }
 
 
     public List<Alumno> obtenerAlumnosQueAdeudanMaterias() {
-        return listaAlumnos.stream().filter(a -> a.isAdeudaMateriasSecundario() == true).toList();
+        return alumnoRepository.findAll().stream().filter(a -> a.isAdeudaMateriasSecundario() == true).toList();
     }
 
     public List<Alumno> obtenerAlumnosQueNoAbonaron() {
-        return listaAlumnos.stream().filter(a -> a.isAbonoMatricula() == false).toList();
+        return alumnoRepository.findAll().stream().filter(a -> a.isAbonoMatricula() == false).toList();
     }
 
     public List<Alumno> obtenerAlumnoConMayorNota() {
-        double notaMaxima = listaAlumnos.stream().mapToDouble(Alumno::getNotaExamenIngreso).max().orElse(0);
-        return listaAlumnos.stream().filter(a -> a.getNotaExamenIngreso() == notaMaxima).collect(Collectors.toList());
+        double notaMaxima = alumnoRepository.findAll().stream().mapToDouble(Alumno::getNotaExamenIngreso).max().orElse(0);
+        return alumnoRepository.findAll().stream().filter(a -> a.getNotaExamenIngreso() == notaMaxima).collect(Collectors.toList());
     }
 
 }
