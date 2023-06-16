@@ -2,7 +2,7 @@ package com.example.alumnosApi.controllers;
 
 import com.example.alumnosApi.entities.Alumno;
 import com.example.alumnosApi.services.AlumnoServices;
-import com.example.alumnosApi.services.Response;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,17 +31,17 @@ public class AlumnoController {
     }
 
     @PostMapping("/crear")
-    public Response sumarAlumno(@RequestBody Alumno alumno){
+    public Alumno sumarAlumno(@RequestBody @Valid Alumno alumno){
         return alumnoServices.sumarAlumno(alumno);
     }
 
     @PutMapping("/actualizar/{id}")
-    public Response modificarAlumno(@RequestBody Alumno alumnoActualizado, @PathVariable("id") Long id){
+    public Alumno modificarAlumno(@RequestBody Alumno alumnoActualizado, @PathVariable("id") Long id){
         return alumnoServices.editarAlumno(id, alumnoActualizado);
     }
 
     @DeleteMapping ("/borrar/{id}")
-    public Response borrarAlumno(@PathVariable("id") Long id){
+    public List<Alumno> borrarAlumno(@PathVariable("id") Long id){
         return alumnoServices.borrarAlumno(id);
     }
 
