@@ -45,9 +45,4 @@ public class AlumnoController {
         return alumnoServices.borrarAlumno(id);
     }
 
-    @GetMapping("*")
-    public String rutaNoEncontrada(){
-        return "ERROR 404: La ruta a la que ingresó, no existe.";
-    }
-
 }
