@@ -15,6 +15,43 @@ import org.springframework.validation.FieldError;
 @RestControllerAdvice
 public class ExceptionHandlerGlobal {
 
+    @ExceptionHandler(Exception.class)
+    public RespuestaError handleException(Exception ex) {
+
+        RespuestaError respuestaError = new RespuestaError();
+        respuestaError.setCodigo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        respuestaError.setMensaje("Ocurrió un error en el servidor. Por favor, intenta de nuevo más tarde.");
+
+        return respuestaError;
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public RespuestaError handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        RespuestaError respuestaError = new RespuestaError();
+
+        respuestaError.setCodigo(HttpStatus.BAD_REQUEST.value());
+
+        List<FieldError> inputsErroneos = ex.getBindingResult().getFieldErrors();
+        StringJoiner errores = new StringJoiner(", ");
+        for (FieldError error : inputsErroneos) {
+            String nombreInput = error.getField();
+            String errorInput = nombreInput +": " + error.getDefaultMessage();
+            errores.add(errorInput);
+        }
+        respuestaError.setMensaje(errores.toString());
+
+        return respuestaError;
+    }
+
+    @ExceptionHandler(IdInvalidoException.class)
+    public RespuestaError handleIdInvalidoException(IdInvalidoException ex) {
+        RespuestaError respuestaError = new RespuestaError();
+        respuestaError.setCodigo(HttpStatus.BAD_REQUEST.value());
+        respuestaError.setMensaje(ex.getMessage());
+
+        return respuestaError;
+    }
+
     @ExceptionHandler(NoHandlerFoundException.class)
     public RespuestaError handleNoHandlerFoundException(NoHandlerFoundException ex) {
         RespuestaError respuestaError = new RespuestaError();
