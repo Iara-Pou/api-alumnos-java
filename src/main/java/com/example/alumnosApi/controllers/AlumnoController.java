@@ -15,10 +15,10 @@ public class AlumnoController {
     private AlumnoServices alumnoServices;
     @GetMapping
     public List obtenerAlumnos(@RequestParam(required = false) boolean ordenApellidoDescendiente,
-                                       @RequestParam(required = false) boolean adeudanMaterias,
-                                       @RequestParam(required = false) boolean abonoPendiente,
-                                       @RequestParam(required = false) boolean promedioEdad,
-                                       @RequestParam(required = false) boolean mayorNota) {
+                               @RequestParam(required = false) boolean adeudanMaterias,
+                               @RequestParam(required = false) boolean abonoPendiente,
+                               @RequestParam(required = false) boolean promedioEdad,
+                               @RequestParam(required = false) boolean mayorNota) {
 
         if (ordenApellidoDescendiente) return alumnoServices.ordenarDecrecientementePorApellido();
         if (adeudanMaterias) return alumnoServices.obtenerAlumnosQueAdeudanMaterias();

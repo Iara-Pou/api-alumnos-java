@@ -10,8 +10,8 @@ import java.util.List;
 
 @Getter
 @Setter
+@Entity
 public class Curso {
-
     private List<Alumno> alumnos = new ArrayList<>();
 
 }
