@@ -1,22 +1,22 @@
 package com.example.alumnosApi.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import jakarta.validation.constraints.*;
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import java.util.Collection;
+import java.util.List;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
+@Builder
 @AllArgsConstructor
 @Entity(name = "alumno")
 @Data
-public class Alumno {
+public class Alumno implements UserDetails{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -35,6 +35,11 @@ public class Alumno {
     @Max(100)
     private int edad;
 
+    @Email
+    private String email;
+
+    private String password;
+
     private boolean adeudaMateriasSecundario;
 
     @NonNull
@@ -44,7 +49,44 @@ public class Alumno {
     @Max(10)
     private double notaExamenIngreso;
 
+    @NonNull
+    private Roles rol = Roles.ALUMNO;
     public Alumno() {
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(rol.name()));
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
+    public String getPassword() {
+        return this.password;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
     //antes tenía un bug porque me faltaba el constructor sin argumentos
 }

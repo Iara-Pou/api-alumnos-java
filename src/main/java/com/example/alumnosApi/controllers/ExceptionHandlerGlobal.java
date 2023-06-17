@@ -15,7 +15,7 @@ import org.springframework.validation.FieldError;
 @RestControllerAdvice
 public class ExceptionHandlerGlobal {
 
-    @ExceptionHandler(Exception.class)
+    //@ExceptionHandler(Exception.class)
     public RespuestaError handleException(Exception ex) {
 
         RespuestaError respuestaError = new RespuestaError();
